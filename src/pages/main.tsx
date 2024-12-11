@@ -4,7 +4,7 @@ import Dropdown from "@/components/dropdown";
 
 const Data = () => {
   const [searchText, setSearchText] = useState("");
-  const [searchGender, setSearchGender] = useState("");
+  const [searchGender, setSearchGender] = useState("Male");
   const filterSerach = data.filter((item) => {
     const firstName = item.first_name
       .toLowerCase()
@@ -59,8 +59,8 @@ const Data = () => {
 
   return (
     <>
-      <div className="p-10 h-full bg-[rgb(245,245,253)] pt-20 ">
-        <div className="grid grid-cols-6 pb-2 gap-10">
+      <div className="p-10 h-full bg-[rgb(245,245,253)] pt-20">
+        <div className="grid grid-cols-1 sm:grid-cols-6 pb-2 gap-10">
           <div className="text-lg ">
             <p>First name</p>
             <input
@@ -73,7 +73,7 @@ const Data = () => {
             />
           </div>
 
-          <div className="text-lg">
+          <div className="text-lg relative z-20">
             <p>Gender</p>
 
             {/* <select
@@ -94,6 +94,7 @@ const Data = () => {
             <Dropdown
               options={["Male", "Female", "Other"]}
               onSelect={setSearchGender}
+              defaultLabel={"Male"}
             />
           </div>
 
@@ -107,27 +108,34 @@ const Data = () => {
           </div>
         </div>
 
-        <div className="grid grid-cols-6 font-bold border bg-[#eaf3fc] text-lg p-2 ">
-          <p className="px-2">id</p>
-          <p>first_name</p>
-          <p>last_name</p>
-          <p>email</p>
-          <p className="px-6">gender</p>
-          <p>ip_address</p>
-        </div>
+        <table className="table-auto w-full border-collapse border border-gray-300 text-lg ">
+          <thead className="flex font-bold border bg-[#eaf3fc]  p-2 sticky top-0 ">
+            <p className="flex-1">id</p>
+            <p className="flex-1">first_name</p>
+            <p className="flex-1">last_name</p>
+            <p className="flex-[2]">email</p>
+            <p className="flex-1">gender</p>
+            <p className="flex-1">ip_address</p>
+          </thead>
 
-        <div className="h-2/3 overflow-auto bg-white ">
-          {filterSerach.map((item, index) => (
-            <div key={index} className="grid grid-cols-6 border p-2 text-lg">
-              <p className="px-2">{item.id}</p>
-              <p>{item.first_name}</p>
-              <p>{item.last_name}</p>
-              <p>{item.email}</p>
-              <p className="px-10">{item.gender}</p>
-              <p className="px-4">{item.ip_address}</p>
-            </div>
-          ))}
-        </div>
+          <div className="h-full bg-white overflow-auto">
+            {filterSerach.map((item, index) => (
+              <tr
+                key={index}
+                className={`flex  border p-2  ${
+                  index % 2 === 0 ? "bg-white" : "bg-[rgb(247,248,253,1)]"
+                }`}
+              >
+                <td className="flex-1">{item.id}</td>
+                <td className="flex-1">{item.first_name}</td>
+                <td className="flex-1">{item.last_name}</td>
+                <td className="flex-[2]">{item.email}</td>
+                <td className="flex-1">{item.gender}</td>
+                <td className="flex-1">{item.ip_address}</td>
+              </tr>
+            ))}
+          </div>
+        </table>
       </div>
     </>
   );
