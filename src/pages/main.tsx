@@ -59,14 +59,14 @@ const Data = () => {
 
   return (
     <>
-      <div className="p-10 h-full bg-[rgb(245,245,253)] pt-20">
-        <div className="grid grid-cols-1 sm:grid-cols-6 pb-2 gap-10">
+      <div className="p-4 lg:p-10 h-full bg-[rgb(245,245,253)]  flex flex-col">
+        <div className="grid grid-cols-1 lg:grid-cols-6 pb-2 gap-x-10">
           <div className="text-lg ">
             <p>First name</p>
             <input
               type="text"
               placeholder="First name"
-              className="shadow-lg border rounded px-4 py-1"
+              className="shadow-lg border rounded px-4 py-1 w-full"
               onChange={(e) => {
                 setSearchText(e.target.value);
               }}
@@ -98,44 +98,49 @@ const Data = () => {
             />
           </div>
 
-          <div className="pt-6">
+          <div className="pt-7">
             <button
               onClick={exportCSV}
-              className="p-2 text-white rounded  bg-blue-400 shadow-lg"
+              className="p-2 text-white rounded  bg-blue-400 shadow-lg w-full"
             >
               Export to CSV
             </button>
           </div>
         </div>
 
+
+        <div className="flex-1 bg-white overflow-auto">
+
         <table className="table-auto w-full border-collapse border border-gray-300 text-lg ">
-          <thead className="flex font-bold border bg-[#eaf3fc]  p-2 sticky top-0 ">
-            <p className="flex-1">id</p>
-            <p className="flex-1">first_name</p>
-            <p className="flex-1">last_name</p>
-            <p className="flex-[2]">email</p>
-            <p className="flex-1">gender</p>
-            <p className="flex-1">ip_address</p>
+          <thead className=" font-bold border bg-[#eaf3fc]  p-2 sticky top-0">
+
+            <th className="text-left p-2">id</th>
+            <th className="text-left p-2">first_name</th>
+            <th className="text-left p-2">last_name</th>
+            <th className="text-left p-2">email</th>
+            <th className="text-left p-2">gender</th>
+            <th className="text-left p-2">ip_address</th>
           </thead>
 
-          <div className="h-full bg-white overflow-auto">
+          <tbody className="h-full bg-white">
             {filterSerach.map((item, index) => (
               <tr
                 key={index}
-                className={`flex  border p-2  ${
+                className={` border p-2  ${
                   index % 2 === 0 ? "bg-white" : "bg-[rgb(247,248,253,1)]"
                 }`}
               >
-                <td className="flex-1">{item.id}</td>
-                <td className="flex-1">{item.first_name}</td>
-                <td className="flex-1">{item.last_name}</td>
-                <td className="flex-[2]">{item.email}</td>
-                <td className="flex-1">{item.gender}</td>
-                <td className="flex-1">{item.ip_address}</td>
+                <td className="p-2">{item.id}</td>
+                <td className="p-2">{item.first_name}</td>
+                <td className="p-2">{item.last_name}</td>
+                <td className="p-2">{item.email}</td>
+                <td className="p-2">{item.gender}</td>
+                <td className="p-2">{item.ip_address}</td>
               </tr>
             ))}
-          </div>
+          </tbody>
         </table>
+        </div>
       </div>
     </>
   );

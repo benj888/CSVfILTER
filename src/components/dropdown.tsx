@@ -34,7 +34,7 @@ const Dropdown = ({
   }, []);
 
   return (
-    <div ref={dropdownRef} className="inline-block w-40 z-20">
+    <div ref={dropdownRef} className="inline-block w-full">
       <div
         className="border shadow-lg p-2 cursor-pointer bg-white h-10 rounded-md flex items-center justify-between"
         onClick={() => {

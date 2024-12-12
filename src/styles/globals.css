@@ -25,7 +25,7 @@ body {
     text-wrap: balance;
   }
 }
-html, body {
+html, body, #__next {
   height: 100%;
 }
 
