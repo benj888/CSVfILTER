@@ -24,6 +24,8 @@ body {
   .text-balance {
     text-wrap: balance;
   }
+
+
 }
 html, body, #__next {
   height: 100%;
@@ -32,3 +34,6 @@ html, body, #__next {
 #root, .h-full {
   height: 100%;
 }
+
+
+

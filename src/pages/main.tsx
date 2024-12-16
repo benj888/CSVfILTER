@@ -1,25 +1,30 @@
 import { data } from "../../data/mock_data";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Dropdown from "@/components/dropdown";
 
 const Data = () => {
   const [searchText, setSearchText] = useState("");
   const [searchGender, setSearchGender] = useState("Male");
-  const filterSerach = data.filter((item) => {
-    const firstName = item.first_name
-      .toLowerCase()
-      .includes(searchText.toLowerCase());
-    const gender = searchGender === item.gender;
-    const MaleOrFemale = item.gender !== "Female" && item.gender !== "Male";
+  const [clicklist, setClicklist] = useState(data);
 
-    if (searchGender === "") {
-      return firstName;
-    } else if (searchGender === "Other") {
-      return firstName && MaleOrFemale;
-    } else {
-      return firstName && gender;
-    }
-  });
+  useEffect(() => {
+    const filterSerach = data.filter((item) => {
+      const firstName = item.first_name
+        .toLowerCase()
+        .includes(searchText.toLowerCase());
+      const gender = searchGender === item.gender;
+      const MaleOrFemale = item.gender !== "Female" && item.gender !== "Male";
+
+      if (searchGender === "") {
+        return firstName;
+      } else if (searchGender === "Other") {
+        return firstName && MaleOrFemale;
+      } else {
+        return firstName && gender;
+      }
+    });
+    setClicklist(filterSerach);
+  }, [searchText, searchGender]);
 
   const exportCSV = () => {
     const csvHeader = [
@@ -30,7 +35,7 @@ const Data = () => {
       "gender",
       "ip_address",
     ];
-    const exportData = filterSerach.map((item, index) => [
+    const exportData = clicklist.map((item, index) => [
       item.id,
       item.first_name,
       item.last_name,
@@ -55,6 +60,25 @@ const Data = () => {
       document.body.appendChild(link);
       link.click();
     }
+  };
+
+  const [draggingIndex, setDraggingIndex] = useState<number | null>(null);
+
+  const handledragging = (index: number) => {
+    setDraggingIndex(index);
+  };
+
+  const handleDrop = (index: number) => {
+    if (draggingIndex === null || draggingIndex === index) return;
+    const editList = [...clicklist];
+    const [draggedItem] = editList.splice(draggingIndex, 1);
+    editList.splice(index, 0, draggedItem);
+    setClicklist(editList);
+    setDraggingIndex(null);
+  };
+
+  const handleDragEnd = () => {
+    setDraggingIndex(null);
   };
 
   return (
@@ -108,38 +132,55 @@ const Data = () => {
           </div>
         </div>
 
-
         <div className="flex-1 bg-white overflow-auto">
-
-        <table className="table-auto w-full border-collapse border border-gray-300 text-lg ">
-          <thead className=" font-bold border bg-[#eaf3fc]  p-2 sticky top-0">
-
-            <th className="text-left p-2">id</th>
-            <th className="text-left p-2">first_name</th>
-            <th className="text-left p-2">last_name</th>
-            <th className="text-left p-2">email</th>
-            <th className="text-left p-2">gender</th>
-            <th className="text-left p-2">ip_address</th>
-          </thead>
-
-          <tbody className="h-full bg-white">
-            {filterSerach.map((item, index) => (
-              <tr
-                key={index}
-                className={` border p-2  ${
-                  index % 2 === 0 ? "bg-white" : "bg-[rgb(247,248,253,1)]"
-                }`}
-              >
-                <td className="p-2">{item.id}</td>
-                <td className="p-2">{item.first_name}</td>
-                <td className="p-2">{item.last_name}</td>
-                <td className="p-2">{item.email}</td>
-                <td className="p-2">{item.gender}</td>
-                <td className="p-2">{item.ip_address}</td>
+          <table className="table-auto w-full border-collapse border border-gray-300 text-lg ">
+            <thead className=" font-bold border bg-[#eaf3fc]  p-2 sticky top-0">
+              <tr>
+                <th className="text-left p-2">id</th>
+                <th className="text-left p-2">first_name</th>
+                <th className="text-left p-2">last_name</th>
+                <th className="text-left p-2">email</th>
+                <th className="text-left p-2">gender</th>
+                <th className="text-left p-2">ip_address</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+
+            <tbody className="h-full bg-white">
+              {clicklist.map((item, index) => (
+                <tr
+                  key={index}
+                  className={` border p-2 cursor-pointer hover:bg-gray-300  duration-200
+                    ${index % 2 === 0 ? "bg-white" : "bg-[rgb(247,248,253,1)]"}
+                 ${draggingIndex === index?"bg-gray-300 shadow-lg":""}
+                    `}
+                  draggable
+                  onDragStart={() => handledragging(index)}
+                  onDragOver={(e) => e.preventDefault()}
+                  onDrop={() => handleDrop(index)}
+                  onDragEnd={handleDragEnd}
+                >
+                  <td className="p-2">{item.id}</td>
+                  <td className="p-2">{item.first_name}</td>
+                  <td className="p-2">{item.last_name}</td>
+                  <td className="p-2">{item.email}</td>
+                  <td className="p-2">{item.gender}</td>
+                  <td className="p-2">{item.ip_address}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+
+          {/* {clicklist.map((item, index) => (
+              <div key={index}
+               draggable
+               onDragStart={()=>handledragging(index)}
+               onDragOver={(e) => e.preventDefault()}
+               onDrop={() => handleDrop(index)}
+               onDragEnd={handleDragEnd}
+               >
+                {item}
+              </div>
+            ))} */}
         </div>
       </div>
     </>
