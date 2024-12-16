@@ -4,24 +4,37 @@ import Dropdown from "@/components/dropdown";
 
 const Data = () => {
   const [searchText, setSearchText] = useState("");
-  const [searchGender, setSearchGender] = useState("Male");
+  const [searchGender, setSearchGender] = useState<string[]>([]);
   const [clicklist, setClicklist] = useState(data);
+
+//   const [trysearchGender, settrySearchGender] = useState([""]);
 
   useEffect(() => {
     const filterSerach = data.filter((item) => {
       const firstName = item.first_name
         .toLowerCase()
         .includes(searchText.toLowerCase());
-      const gender = searchGender === item.gender;
-      const MaleOrFemale = item.gender !== "Female" && item.gender !== "Male";
+    //   const gender = searchGender.length === 0 || searchGender.includes(item.gender)
+    //   const MaleOrFemale = item.gender !== "Female" && item.gender !== "Male";
 
-      if (searchGender === "") {
-        return firstName;
-      } else if (searchGender === "Other") {
-        return firstName && MaleOrFemale;
-      } else {
-        return firstName && gender;
-      }
+    //   if (searchGender.length === 0) {
+    //     return firstName;
+    //   } else if (searchGender.includes("Other")) {
+    //     return firstName && MaleOrFemale;
+    //   } else {
+    //     return firstName && gender;
+    //   }
+        
+        
+        const other = searchGender.includes("Other") && item.gender !== "Male" && item.gender !== "Female";
+
+        const gender =  searchGender.includes(item.gender) || other
+
+        if (searchGender.length === 0) {
+            return firstName; 
+        }
+        
+        else return firstName&&gender
     });
     setClicklist(filterSerach);
   }, [searchText, searchGender]);
@@ -118,7 +131,7 @@ const Data = () => {
             <Dropdown
               options={["Male", "Female", "Other"]}
               onSelect={setSearchGender}
-              defaultLabel={"Male"}
+            
             />
           </div>
 
@@ -149,7 +162,7 @@ const Data = () => {
               {clicklist.map((item, index) => (
                 <tr
                   key={index}
-                  className={` border p-2 cursor-pointer hover:bg-gray-300  duration-200
+                  className={`border p-2 cursor-pointer hover:bg-gray-300  duration-200
                     ${index % 2 === 0 ? "bg-white" : "bg-[rgb(247,248,253,1)]"}
                  ${draggingIndex === index?"bg-gray-300 shadow-lg":""}
                     `}
