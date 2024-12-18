@@ -3,13 +3,13 @@ import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 interface DropdownProps {
   options: string[];
   onSelect: (value: string[]) => void;
-  defaultLabel?: string[];
+  placeholder?: string;
 }
 
 const Dropdown = ({
   options,
   onSelect,
-  defaultLabel = [],
+  placeholder = "Select an option"
 }: DropdownProps) => {
   const [open, setOpen] = useState(false);
 
@@ -50,13 +50,13 @@ const Dropdown = ({
   return (
     <div ref={dropdownRef} className="inline-block w-full">
       <div
-        className="border shadow-lg p-2 cursor-pointer bg-white h-10 rounded-md flex items-center justify-between"
+        className={`border shadow-lg p-2 cursor-pointer bg-white h-10 rounded-md flex items-center justify-between ${selectedOption.length===0?"text-[#9ca3af]":"text-black"}`}
         onClick={() => {
           setOpen(!open);
           
         }}
       >
-        {selectedOption.length > 0 ? selectedOption.join(", ") : defaultLabel} 
+        {selectedOption.length > 0 ? selectedOption.join(", ") : placeholder} 
 
         <KeyboardArrowDownIcon sx={{ fontSize: 32 }} className="absolute ml-56"/>
       </div>
