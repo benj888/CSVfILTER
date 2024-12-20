@@ -183,17 +183,7 @@ const Data = () => {
             </tbody>
           </table>
 
-          {/* {clicklist.map((item, index) => (
-              <div key={index}
-               draggable
-               onDragStart={()=>handledragging(index)}
-               onDragOver={(e) => e.preventDefault()}
-               onDrop={() => handleDrop(index)}
-               onDragEnd={handleDragEnd}
-               >
-                {item}
-              </div>
-            ))} */}
+
         </div>
       </div>
     </>
