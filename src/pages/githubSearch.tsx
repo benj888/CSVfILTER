@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 
 interface Repository {
   id: number;
@@ -16,46 +16,78 @@ const GithubSearch = () => {
     items: [],
     total_count: 0,
   });
-  const [query, setQuery] = useState("reactaa");
+  const [query, setQuery] = useState("");
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState<string>("30");
+  const abortControllerRef = useRef<AbortController | null>(null);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        const response = await fetch(
-          `https://api.github.com/search/repositories?q=${query}&param_page=${page}&per_page=${perPage}`,
-          {
-            headers: {
-              "Content-Type": "application/json; charset=UTF-8",
-              Accept: "application/vnd.github+json",
-            },
-          }
-        );
-        const data = await response.json();
+  const fetchData = async (reset:boolean = false) => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+    
+    abortControllerRef.current = new AbortController();
 
-        setRepositories(data);
-        // console.log(typeof data);
-        // console.log(repositories);
-      } catch (error) {
-        console.error("Error fetching:", error);
-      } finally {
-        setLoading(false);
+    setLoading(true);
+    try {
+      const response = await fetch(
+        `https://api.github.com/search/repositories?q=${query}&param_page=${page}&per_page=${perPage}`,
+        {
+          headers: {
+            "Content-Type": "application/json; charset=UTF-8",
+            Accept: "application/vnd.github+json",
+          },
+          signal: abortControllerRef.current.signal
+        }
+      );
+      const data = await response.json();
+
+      if (reset){
+        setRepositories(data)
       }
-    };
-    fetchData();
-  }, [query, page, perPage]);
+      else{
+        setRepositories((prev) => ({
+            ...prev,
+            items:[...prev.items,...data.items]
+        }));
+      }
 
-  const handlePage = (pageNumber: number) => {
-    if (
-      pageNumber > 0 &&
-      pageNumber <= Math.ceil(repositories.total_count / 30)
-    ) {
-      setPage(pageNumber);
+
+      
+    } catch (error) {
+      console.error("Error fetching:", error);
+    } finally {
+      setLoading(false);
     }
   };
+
+  useEffect(() => {
+
+    if (query) {
+      setPage(1);
+      fetchData(true);
+      
+    }
+  }, [query,perPage]);
+
+
+  useEffect(() => {
+    if (page > 1) {
+      fetchData();
+    }
+  }, [page]);
+
+
+
+//   const handlePage = (pageNumber: number) => {
+//     if (
+//       pageNumber > 0 &&
+//       pageNumber <= Math.ceil(repositories.total_count / 30)
+//     ) {
+//       setPage(pageNumber);
+//     }
+//   };
 
   const handleScroll = (e: React.UIEvent) => {
     const { scrollHeight, scrollTop, clientHeight } = e.currentTarget;
@@ -145,26 +177,25 @@ const GithubSearch = () => {
           loading ? "opacity-0" : "opacity-100"
         }`}
       >
-        <button onClick={() => handlePage(page - 1)} disabled={page === 1}>
+        {/* <button onClick={() => handlePage(page - 1)} disabled={page === 1}>
           Previous
-        </button>
+        </button> */}
         <span className="text-lg">
-          
-          <input 
-          className="shadow-lg border rounded px-4 py-1 w-16" type="text" 
-          value= {page}
-          onChange={(e)=>setPage(Number(e.target.value))}
+          <input
+            className="shadow-lg border rounded px-4 py-1 w-16"
+            type="text"
+            value={page}
+            onChange={(e) => setPage(Number(e.target.value))}
           />
-          
-         /{Math.ceil(repositories.total_count / 30)}
+          /{Math.ceil(repositories.total_count / 30)}
         </span>
 
-        <button
+        {/* <button
           onClick={() => handlePage(page + 1)}
           disabled={page === Math.ceil(repositories.total_count / 30)}
         >
           NEXT
-        </button>
+        </button> */}
       </div>
     </div>
   );
