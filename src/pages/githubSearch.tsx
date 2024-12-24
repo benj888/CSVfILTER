@@ -22,11 +22,11 @@ const GithubSearch = () => {
   const [perPage, setPerPage] = useState<string>("30");
   const abortControllerRef = useRef<AbortController | null>(null);
 
-  const fetchData = async (reset:boolean = false) => {
+  const fetchData = async (reset: boolean = false) => {
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();
     }
-    
+
     abortControllerRef.current = new AbortController();
 
     setLoading(true);
@@ -38,23 +38,19 @@ const GithubSearch = () => {
             "Content-Type": "application/json; charset=UTF-8",
             Accept: "application/vnd.github+json",
           },
-          signal: abortControllerRef.current.signal
+          signal: abortControllerRef.current.signal,
         }
       );
       const data = await response.json();
 
-      if (reset){
-        setRepositories(data)
-      }
-      else{
+      if (reset) {
+        setRepositories(data);
+      } else {
         setRepositories((prev) => ({
-            ...prev,
-            items:[...prev.items,...data.items]
+          ...prev,
+          items: [...prev.items, ...data.items],
         }));
       }
-
-
-      
     } catch (error) {
       console.error("Error fetching:", error);
     } finally {
@@ -63,31 +59,26 @@ const GithubSearch = () => {
   };
 
   useEffect(() => {
-
     if (query) {
       setPage(1);
       fetchData(true);
-      
     }
-  }, [query,perPage]);
-
+  }, [query, perPage]);
 
   useEffect(() => {
     if (page > 1) {
-      fetchData();
+      fetchData(); 
     }
   }, [page]);
 
-
-
-//   const handlePage = (pageNumber: number) => {
-//     if (
-//       pageNumber > 0 &&
-//       pageNumber <= Math.ceil(repositories.total_count / 30)
-//     ) {
-//       setPage(pageNumber);
-//     }
-//   };
+  //   const handlePage = (pageNumber: number) => {
+  //     if (
+  //       pageNumber > 0 &&
+  //       pageNumber <= Math.ceil(repositories.total_count / 30)
+  //     ) {
+  //       setPage(pageNumber);
+  //     }
+  //   };
 
   const handleScroll = (e: React.UIEvent) => {
     const { scrollHeight, scrollTop, clientHeight } = e.currentTarget;
@@ -135,9 +126,7 @@ const GithubSearch = () => {
         </div>
       </div>
 
-      {loading ? (
-        <div>loading...</div>
-      ) : (
+
         <div className="border ">
           <table className="table-auto w-full  border  text-lg ">
             <thead className="p-2 sticky top-0 bg-[#eaf3fc]">
@@ -164,13 +153,20 @@ const GithubSearch = () => {
                 ))
               ) : (
                 <tr>
-                  <td>NaN</td>
+                  <td colSpan={3} className="text-center">NaN</td>
+                </tr>
+              )}
+              {loading&&(
+                <tr>
+                  <td colSpan={3} className="text-center">
+                    Loading...
+                  </td>
                 </tr>
               )}
             </tbody>
           </table>
         </div>
-      )}
+      
 
       <div
         className={`h-10 bg-white flex justify-between mt-4 sticky bottom-0 ${
