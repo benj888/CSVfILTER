@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
-
+import { useRouter } from "next/router";
 interface Repository {
   id: number;
   name: string;
@@ -94,6 +94,8 @@ const GithubSearch = () => {
     }
   };
 
+  const router = useRouter();
+
   return (
     <div className="p-2 h-full overflow-auto" onScroll={handleScroll}>
       <div className="text-center text-2xl">Github Repo Search</div>
@@ -123,6 +125,13 @@ const GithubSearch = () => {
               setPage(1);
             }}
           />
+        </div>
+        <div className="w-60 text-center bg-red-400 rounded shadow-lg pt-4">
+          <button className="text-xl"
+          onClick={()=>router.push("http://localhost:3000/dataSearch")}
+          >
+            To Data Search...
+            </button>
         </div>
       </div>
 

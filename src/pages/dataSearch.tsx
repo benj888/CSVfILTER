@@ -1,40 +1,41 @@
 import { data } from "../../data/mock_data";
 import { useEffect, useState } from "react";
 import Dropdown from "@/components/dropdown";
+import { useRouter } from "next/router";
 
 const Data = () => {
   const [searchText, setSearchText] = useState("");
   const [searchGender, setSearchGender] = useState<string[]>([]);
   const [clicklist, setClicklist] = useState(data);
 
-//   const [trysearchGender, settrySearchGender] = useState([""]);
+  //   const [trysearchGender, settrySearchGender] = useState([""]);
 
   useEffect(() => {
     const filterSerach = data.filter((item) => {
       const firstName = item.first_name
         .toLowerCase()
         .includes(searchText.toLowerCase());
-    //   const gender = searchGender.length === 0 || searchGender.includes(item.gender)
-    //   const MaleOrFemale = item.gender !== "Female" && item.gender !== "Male";
+      //   const gender = searchGender.length === 0 || searchGender.includes(item.gender)
+      //   const MaleOrFemale = item.gender !== "Female" && item.gender !== "Male";
 
-    //   if (searchGender.length === 0) {
-    //     return firstName;
-    //   } else if (searchGender.includes("Other")) {
-    //     return firstName && MaleOrFemale;
-    //   } else {
-    //     return firstName && gender;
-    //   }
-        
-        
-        const other = searchGender.includes("Other") && item.gender !== "Male" && item.gender !== "Female";
+      //   if (searchGender.length === 0) {
+      //     return firstName;
+      //   } else if (searchGender.includes("Other")) {
+      //     return firstName && MaleOrFemale;
+      //   } else {
+      //     return firstName && gender;
+      //   }
 
-        const gender =  searchGender.includes(item.gender) || other
+      const other =
+        searchGender.includes("Other") &&
+        item.gender !== "Male" &&
+        item.gender !== "Female";
 
-        if (searchGender.length === 0) {
-            return firstName; 
-        }
-        
-        else return firstName&&gender
+      const gender = searchGender.includes(item.gender) || other;
+
+      if (searchGender.length === 0) {
+        return firstName;
+      } else return firstName && gender;
     });
     setClicklist(filterSerach);
   }, [searchText, searchGender]);
@@ -93,7 +94,7 @@ const Data = () => {
   const handleDragEnd = () => {
     setDraggingIndex(null);
   };
-
+  const router = useRouter();
   return (
     <>
       <div className="p-4 lg:p-10 h-full bg-[rgb(245,245,253)]  flex flex-col">
@@ -131,7 +132,6 @@ const Data = () => {
             <Dropdown
               options={["Male", "Female", "Other"]}
               onSelect={setSearchGender}
-            
             />
           </div>
 
@@ -141,6 +141,15 @@ const Data = () => {
               className="p-2 text-white rounded  bg-blue-400 shadow-lg w-full"
             >
               Export to CSV
+            </button>
+          </div>
+
+          <div className="pt-7">
+            <button
+              className="text-white w-full p-2 bg-red-400 rounded shadow-lg"
+              onClick={() => router.push("http://localhost:3000")}
+            >
+              To Github Search
             </button>
           </div>
         </div>
@@ -164,7 +173,7 @@ const Data = () => {
                   key={index}
                   className={`border p-2 cursor-pointer hover:bg-gray-300  duration-200
                     ${index % 2 === 0 ? "bg-white" : "bg-[rgb(247,248,253,1)]"}
-                 ${draggingIndex === index?"bg-gray-300 shadow-lg":""}
+                 ${draggingIndex === index ? "bg-gray-300 shadow-lg" : ""}
                     `}
                   draggable
                   onDragStart={() => handledragging(index)}
@@ -182,8 +191,6 @@ const Data = () => {
               ))}
             </tbody>
           </table>
-
-
         </div>
       </div>
     </>
