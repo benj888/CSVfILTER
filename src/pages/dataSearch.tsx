@@ -147,7 +147,7 @@ const Data = () => {
           <div className="pt-7">
             <button
               className="text-white w-full p-2 bg-red-400 rounded shadow-lg"
-              onClick={() => router.push("http://localhost:3000")}
+              onClick={() => router.push("/")}
             >
               To Github Search
             </button>
