@@ -2,29 +2,53 @@ import { data } from "../../data/mock_data";
 import { useEffect, useState } from "react";
 import Dropdown from "@/components/dropdown";
 import { useRouter } from "next/router";
-
+import { PortalDraw } from "@/components/portalDrawer";
 const Data = () => {
   const [searchText, setSearchText] = useState("");
   const [searchGender, setSearchGender] = useState<string[]>([]);
   const [clicklist, setClicklist] = useState(data);
 
-  //   const [trysearchGender, settrySearchGender] = useState([""]);
+  const [newdata, setNewdata] = useState({
+    id: Math.max(...clicklist.map((item) => item.id))+ 1 ,
+    first_name: "",
+    last_name: "",
+    email: "",
+    gender: "",
+    ip_address: "",
+  });
+
+  const handleAddData = () => {
+    if (
+      newdata.id &&
+      newdata.first_name &&
+      newdata.gender &&
+      newdata.last_name &&
+      newdata.ip_address &&
+      newdata.email
+    ) {
+      setClicklist([...clicklist, newdata]);
+      // clicklist.push(newdata);
+      setNewdata({
+        id: Math.max(...clicklist.map((item) => item.id))+ 1 ,
+        first_name: "",
+        last_name: "",
+        email: "",
+        gender: "",
+        ip_address: "",
+      });
+      setnewDataWindow(false);
+    } else {
+      alert("還有資料未填寫");
+    }
+  };
+
+  const [newDataWindow, setnewDataWindow] = useState(false);
 
   useEffect(() => {
     const filterSerach = data.filter((item) => {
       const firstName = item.first_name
         .toLowerCase()
         .includes(searchText.toLowerCase());
-      //   const gender = searchGender.length === 0 || searchGender.includes(item.gender)
-      //   const MaleOrFemale = item.gender !== "Female" && item.gender !== "Male";
-
-      //   if (searchGender.length === 0) {
-      //     return firstName;
-      //   } else if (searchGender.includes("Other")) {
-      //     return firstName && MaleOrFemale;
-      //   } else {
-      //     return firstName && gender;
-      //   }
 
       const other =
         searchGender.includes("Other") &&
@@ -95,6 +119,7 @@ const Data = () => {
     setDraggingIndex(null);
   };
   const router = useRouter();
+
   return (
     <>
       <div className="p-4 lg:p-10 h-full bg-[rgb(245,245,253)]  flex flex-col">
@@ -146,6 +171,97 @@ const Data = () => {
 
           <div className="pt-7">
             <button
+              className="text-white w-full p-2 bg-blue-400 rounded shadow-lg"
+              onClick={() => setnewDataWindow(true)}
+            >
+              ADD
+            </button>
+
+            <PortalDraw
+              visible={newDataWindow}
+              handleSetVisible={setnewDataWindow}
+            >
+              <div className="p-6 ">
+                <div className="flex items-center pb-4">
+                  <label className="w-24 font-semibold">First Name:</label>
+                  <input
+                    type="text"
+                    className="border p-2"
+                    placeholder="First Name"
+                    value={newdata.first_name}
+                    onChange={(e) =>
+                      setNewdata({ ...newdata, first_name: e.target.value })
+                    }
+                  />
+                </div>
+
+                <div className="flex items-center pb-4">
+                  <label className="w-24 font-semibold">Last Name:</label>
+                  <input
+                    type="text"
+                    className="border p-2"
+                    placeholder="Last Name"
+                    value={newdata.last_name}
+                    onChange={(e) =>
+                      setNewdata({ ...newdata, last_name: e.target.value })
+                    }
+                  />
+                </div>
+
+                <div className="flex items-center pb-4">
+                  <label className="w-24 font-semibold">Email:</label>
+                  <input
+                    type="text"
+                    className="border p-2"
+                    placeholder="Email"
+                    value={newdata.email}
+                    onChange={(e) =>
+                      setNewdata({ ...newdata, email: e.target.value })
+                    }
+                  />
+                </div>
+
+                <div className="flex items-center pb-4">
+                  <label className="w-24 font-semibold">Gender:</label>
+                  <input
+                    type="text"
+                    className="border p-2"
+                    placeholder="Gender"
+                    value={newdata.gender}
+                    onChange={(e) =>
+                      setNewdata({ ...newdata, gender: e.target.value })
+                    }
+                  />
+                </div>
+
+                <div className="flex items-center pb-4">
+                  <label className="w-24 font-semibold">IP Address:</label>
+                  <input
+                    type="text"
+                    className="border p-2"
+                    placeholder="IP Address"
+                    value={newdata.ip_address}
+                    onChange={(e) =>
+                      setNewdata({ ...newdata, ip_address: e.target.value })
+                    }
+                  />
+                </div>
+
+                <div
+                  className="mt-20 ml-32 text-xl text-center shadow-lg border w-20 bg-blue-300 cursor-pointer"
+                  onClick={() => {
+                    handleAddData();
+                    setnewDataWindow(false);
+                  }}
+                >
+                  <button>送出</button>
+                </div>
+              </div>
+            </PortalDraw>
+          </div>
+
+          <div className="pt-7">
+            <button
               className="text-white w-full p-2 bg-red-400 rounded shadow-lg"
               onClick={() => router.push("/")}
             >
@@ -170,7 +286,7 @@ const Data = () => {
             <tbody className="h-full bg-white">
               {clicklist.map((item, index) => (
                 <tr
-                  key={index}
+                  key={item.id}
                   className={`border p-2 cursor-pointer hover:bg-gray-300  duration-200
                     ${index % 2 === 0 ? "bg-white" : "bg-[rgb(247,248,253,1)]"}
                  ${draggingIndex === index ? "bg-gray-300 shadow-lg" : ""}

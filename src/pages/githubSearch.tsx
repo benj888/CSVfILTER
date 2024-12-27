@@ -128,7 +128,7 @@ const GithubSearch = () => {
         </div>
         <div className="w-60 text-center bg-red-400 rounded shadow-lg pt-4">
           <button className="text-xl"
-          onClick={()=>router.push("/dataSearch")}
+          onClick={()=>router.push("/")}
           >
             To Data Search...
             </button>
