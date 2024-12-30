@@ -1,15 +1,27 @@
 import { data } from "../../data/mock_data";
-import { useEffect, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import Dropdown from "@/components/dropdown";
 import { useRouter } from "next/router";
 import { PortalDraw } from "@/components/portalDrawer";
+import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
+import EditIcon from "@mui/icons-material/Edit";
+
 const Data = () => {
   const [searchText, setSearchText] = useState("");
   const [searchGender, setSearchGender] = useState<string[]>([]);
+
   const [clicklist, setClicklist] = useState(data);
 
+  const [newList, setNewList] = useState(data);
+
+  const [editDataTri, setEditDataTri] = useState(false);
+
+  const [editData, setEditData] = useState(false);
+
+  const router = useRouter();
+
   const [newdata, setNewdata] = useState({
-    id: Math.max(...clicklist.map((item) => item.id))+ 1 ,
+    id: Math.max(...newList.map((item) => item.id)),
     first_name: "",
     last_name: "",
     email: "",
@@ -26,26 +38,38 @@ const Data = () => {
       newdata.ip_address &&
       newdata.email
     ) {
-      setClicklist([...clicklist, newdata]);
-      // clicklist.push(newdata);
-      setNewdata({
-        id: Math.max(...clicklist.map((item) => item.id))+ 1 ,
+      // setClicklist([...clicklist, newdata]);
+      setNewList([...newList, newdata]);
+
+      setNewdata((prev) => ({
+        ...prev,
         first_name: "",
         last_name: "",
         email: "",
         gender: "",
         ip_address: "",
-      });
+      }));
       setnewDataWindow(false);
     } else {
       alert("還有資料未填寫");
     }
   };
 
+  useEffect(() => {
+    if (newList.length > 0) {
+      setNewdata((prev) => ({
+        ...prev,
+        id: Math.max(...newList.map((item) => item.id)) + 1,
+      }));
+    } else {
+      setNewdata((prev) => ({ ...prev, id: 1 }));
+    }
+  }, [newList]);
+
   const [newDataWindow, setnewDataWindow] = useState(false);
 
   useEffect(() => {
-    const filterSerach = data.filter((item) => {
+    const filterSerach = newList.filter((item) => {
       const firstName = item.first_name
         .toLowerCase()
         .includes(searchText.toLowerCase());
@@ -62,8 +86,9 @@ const Data = () => {
       } else return firstName && gender;
     });
     setClicklist(filterSerach);
-  }, [searchText, searchGender]);
+  }, [searchText, searchGender, newList]);
 
+  // csv
   const exportCSV = () => {
     const csvHeader = [
       "id",
@@ -100,6 +125,8 @@ const Data = () => {
     }
   };
 
+  // drag
+
   const [draggingIndex, setDraggingIndex] = useState<number | null>(null);
 
   const handledragging = (index: number) => {
@@ -118,12 +145,50 @@ const Data = () => {
   const handleDragEnd = () => {
     setDraggingIndex(null);
   };
-  const router = useRouter();
+
+  //delete
+  const [isCheckboxVisible, setIsCheckboxVisible] = useState(false);
+  const [deleteId, setDeleteId] = useState<number[]>([]);
+
+  const handleCheckDelete = (id: number) => {
+    if (deleteId.includes(id)) {
+      setDeleteId(deleteId.filter((checkId) => checkId !== id));
+    } else {
+      setDeleteId((prevId) => [...prevId, id]);
+    }
+  };
+  const handleDeleteSelected = () => {
+    setNewList((prev) => prev.filter((item) => !deleteId.includes(item.id)));
+    setDeleteId([]);
+    setIsCheckboxVisible(false);
+  };
+
+  // edit
+  type NewData = {
+    id: number;
+    first_name: string;
+    last_name: string;
+    email: string;
+    gender: string;
+    ip_address: string;
+  };
+
+  const [editItem, setEditItem] = useState<any>(null);
+
+  const handleSaveEdit = () => {
+    setNewList((prevList) =>
+      prevList.map((item) =>
+        item.id === editItem.id ? { ...item, ...editItem } : item
+      )
+    );
+    setEditItem(null);
+  };
+
 
   return (
     <>
       <div className="p-4 lg:p-10 h-full bg-[rgb(245,245,253)]  flex flex-col">
-        <div className="grid grid-cols-1 lg:grid-cols-6 pb-2 gap-x-10">
+        <div className="grid grid-cols-1 lg:grid-cols-7 pb-2 gap-x-10">
           <div className="text-lg ">
             <p>First name</p>
             <input
@@ -171,7 +236,7 @@ const Data = () => {
 
           <div className="pt-7">
             <button
-              className="text-white w-full p-2 bg-blue-400 rounded shadow-lg"
+              className="text-white w-full p-2 bg-blue-600 rounded shadow-lg"
               onClick={() => setnewDataWindow(true)}
             >
               ADD
@@ -260,20 +325,158 @@ const Data = () => {
             </PortalDraw>
           </div>
 
+          <div
+            className="pt-7"
+            onClick={() => {
+              setIsCheckboxVisible(!isCheckboxVisible);
+              setEditDataTri(false);
+            }}
+          >
+            {isCheckboxVisible ? (
+              <div className="">
+                <button
+                  className="p-2 text-white rounded bg-red-600 shadow-lg w-full"
+                  onClick={handleDeleteSelected}
+                >
+                  Confirm Delete
+                </button>
+              </div>
+            ) : (
+              <button className="p-2 text-white rounded  bg-red-500 shadow-lg w-full">
+                Delete
+              </button>
+            )}
+          </div>
+
+          <div className="pt-7">
+            <button
+              className="p-2 text-white rounded  bg-green-500 shadow-lg w-full"
+              onClick={(e) => {
+                setEditDataTri(!editDataTri);
+                setIsCheckboxVisible(false);
+                e.stopPropagation();
+              }}
+            >
+              Edit
+            </button>
+
+            {editData && (
+              <PortalDraw visible={editData} handleSetVisible={setEditData}>
+                <div className="p-6 ">
+                  <div className="flex items-center pb-4">
+                    <label className="w-24 font-semibold">First Name:</label>
+                    <input
+                      type="text"
+                      className="border p-2"
+                      placeholder="First Name"
+                      value={editItem?.first_name}
+                      onChange={(e) =>
+                        setEditItem((prev: NewData) => ({
+                          ...prev,
+                          first_name: e.target.value,
+                        }))
+                      }
+                    />
+                  </div>
+
+                  <div className="flex items-center pb-4">
+                    <label className="w-24 font-semibold">Last Name:</label>
+                    <input
+                      type="text"
+                      className="border p-2"
+                      placeholder="Last Name"
+                      value={editItem?.last_name}
+                      onChange={(e) =>
+                        setEditItem((prev: NewData) => ({
+                          ...prev,
+                          last_name: e.target.value,
+                        }))
+                      }
+                    />
+                  </div>
+
+                  <div className="flex items-center pb-4">
+                    <label className="w-24 font-semibold">Email:</label>
+                    <input
+                      type="text"
+                      className="border p-2"
+                      placeholder="Email"
+                      value={editItem?.email}
+                      onChange={(e) =>
+                        setEditItem((prev: NewData) => ({
+                          ...prev,
+                          email: e.target.value,
+                        }))
+                      }
+                    />
+                  </div>
+
+                  <div className="flex items-center pb-4">
+                    <label className="w-24 font-semibold">Gender:</label>
+                    <input
+                      type="text"
+                      className="border p-2"
+                      placeholder="Gender"
+                      value={editItem?.gender}
+                      onChange={(e) =>
+                        setEditItem((prev: NewData) => ({
+                          ...prev,
+                          gender: e.target.value,
+                        }))
+                      }
+                    />
+                  </div>
+
+                  <div className="flex items-center pb-4">
+                    <label className="w-24 font-semibold">IP ddress:</label>
+                    <input
+                      type="text"
+                      className="border p-2"
+                      placeholder="IP ddress"
+                      value={editItem?.ip_address}
+                      onChange={(e) =>
+                        setEditItem((prev: NewData) => ({
+                          ...prev,
+                          ip_address: e.target.value,
+                        }))
+                      }
+                    />
+                  </div>
+
+                  <div
+                    className="mt-20 ml-32 text-xl text-center shadow-lg border w-20 bg-blue-300 cursor-pointer"
+                    onClick={() => {
+                      handleSaveEdit();
+                      setEditData(false);
+                    }}
+                  >
+                    <button>保存</button>
+                  </div>
+                </div>
+              </PortalDraw>
+            )}
+          </div>
+
           <div className="pt-7">
             <button
               className="text-white w-full p-2 bg-red-400 rounded shadow-lg"
               onClick={() => router.push("/")}
             >
-              To Github Search
+              To Github Search <ArrowForwardIcon />
             </button>
           </div>
+
+          <div className="mt-10 text-center"></div>
         </div>
 
         <div className="flex-1 bg-white overflow-auto">
-          <table className="table-auto w-full border-collapse border border-gray-300 text-lg ">
-            <thead className=" font-bold border bg-[#eaf3fc]  p-2 sticky top-0">
+          <table className="table-auto w-full  border border-gray-300 text-lg ">
+            <thead className=" font-bold border bg-[#eaf3fc]   sticky top-0">
               <tr>
+                {editDataTri && <th className="text-left p-2"></th>}
+
+                {isCheckboxVisible && <th className="text-left p-2"></th>}
+
                 <th className="text-left p-2">id</th>
                 <th className="text-left p-2">first_name</th>
                 <th className="text-left p-2">last_name</th>
@@ -292,11 +495,38 @@ const Data = () => {
                  ${draggingIndex === index ? "bg-gray-300 shadow-lg" : ""}
                     `}
                   draggable
-                  onDragStart={() => handledragging(index)}
+                  onDragStart={() => {
+                    handledragging(index);
+                  }}
                   onDragOver={(e) => e.preventDefault()}
                   onDrop={() => handleDrop(index)}
                   onDragEnd={handleDragEnd}
                 >
+                  {editDataTri && (
+                    <td
+                      className="p-2 hover:bg-slate-400 rounded-full inline-block"
+                      onClick={(e) => {
+                        setEditData(true);
+
+                        setEditItem(item);
+
+                        e.stopPropagation();
+                      }}
+                    >
+                      <EditIcon />
+                    </td>
+                  )}
+
+                  {isCheckboxVisible && (
+                    <td className="p-2">
+                      <input
+                        type="checkbox"
+                        checked={deleteId.includes(item.id)}
+                        onChange={() => handleCheckDelete(item.id)}
+                        className="scale-150"
+                      />
+                    </td>
+                  )}
                   <td className="p-2">{item.id}</td>
                   <td className="p-2">{item.first_name}</td>
                   <td className="p-2">{item.last_name}</td>

@@ -9,7 +9,7 @@ interface DropdownProps {
 const Dropdown = ({
   options,
   onSelect,
-  placeholder = "Select an option"
+  placeholder = "Please Select"
 }: DropdownProps) => {
   const [open, setOpen] = useState(false);
 
@@ -58,7 +58,7 @@ const Dropdown = ({
       >
         {selectedOption.length > 0 ? selectedOption.join(", ") : placeholder} 
 
-        <KeyboardArrowDownIcon sx={{ fontSize: 32 }} className="absolute ml-56"/>
+        <KeyboardArrowDownIcon sx={{ fontSize: 32 }} className="absolute ml-44"/>
       </div>
 
       {open && (
