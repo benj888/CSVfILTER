@@ -67,7 +67,7 @@ const GithubSearch = () => {
 
   useEffect(() => {
     if (page > 1) {
-      fetchData(); 
+      fetchData();
     }
   }, [page]);
 
@@ -97,7 +97,7 @@ const GithubSearch = () => {
   const router = useRouter();
 
   return (
-    <div className="p-2 h-full overflow-auto" onScroll={handleScroll}>
+    <div className=" p-2 h-full overflow-auto" onScroll={handleScroll}>
       <div className="text-center text-2xl">Github Repo Search</div>
       <div className="flex gap-x-4">
         <div className="flex flex-col">
@@ -127,81 +127,85 @@ const GithubSearch = () => {
           />
         </div>
         <div className="w-60 text-center bg-red-400 rounded shadow-lg pt-4">
-          <button className="text-xl"
-          onClick={()=>router.push("/dataSearch")}
+          <button
+            className="text-xl"
+            onClick={() => router.push("/dataSearch")}
           >
             To Data Search...
-            </button>
+          </button>
         </div>
       </div>
 
+      <div className="border ">
+        <table className="table-auto w-full  border  text-lg ">
+          <thead className="p-2 sticky top-0 bg-[#eaf3fc]">
+            <tr className="text-left">
+              <th className="p-2">NAME</th>
+              <th className="p-2">FULL NAME</th>
+              <th className="p-2">URL</th>
+            </tr>
+          </thead>
 
-        <div className="border ">
-          <table className="table-auto w-full  border  text-lg ">
-            <thead className="p-2 sticky top-0 bg-[#eaf3fc]">
-              <tr className="text-left">
-                <th className="p-2">NAME</th>
-                <th className="p-2">FULL NAME</th>
-                <th className="p-2">URL</th>
+          <tbody>
+            {repositories.items && repositories.items.length > 0 ? (
+              repositories.items.map((item, index) => (
+                <tr
+                  className={`border ${
+                    index % 2 === 0 ? "bg-gray-300" : "bg-white"
+                  }`}
+                  key={index}
+                >
+                  <td className="p-2">{item.name}</td>
+                  <td className="p-2">{item.full_name}</td>
+                  <td className="p-2">{item.url}</td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan={3} className="text-center">
+                  NaN
+                </td>
               </tr>
-            </thead>
-
-            <tbody>
-              {repositories.items && repositories.items.length > 0 ? (
-                repositories.items.map((item, index) => (
-                  <tr
-                    className={`border ${
-                      index % 2 === 0 ? "bg-gray-300" : "bg-white"
-                    }`}
-                    key={index}
-                  >
-                    <td className="p-2">{item.name}</td>
-                    <td className="p-2">{item.full_name}</td>
-                    <td className="p-2">{item.url}</td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan={3} className="text-center">NaN</td>
-                </tr>
-              )}
-              {loading&&(
-                <tr>
-                  <td colSpan={3} className="text-center">
-                    Loading...
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-      
+            )}
+            {loading && (
+              <tr>
+                <td colSpan={3} className="text-center">
+                  Loading...
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
 
       <div
-        className={`h-10 bg-white flex justify-between mt-4 sticky bottom-0 ${
+        className={`h-10 bg-white flex justify-center mt-4 sticky bottom-0 ${
           loading ? "opacity-0" : "opacity-100"
         }`}
       >
-        {/* <button onClick={() => handlePage(page - 1)} disabled={page === 1}>
-          Previous
-        </button> */}
-        <span className="text-lg">
+        
+        <div className="text-lg">
           <input
-            className="shadow-lg border rounded px-4 py-1 w-16"
+            className="shadow-lg border rounded px-4 py-1 w-28"
             type="text"
+            min="1"
+            max={Math.ceil(repositories.total_count / Number(perPage))}
             value={page}
-            onChange={(e) => setPage(Number(e.target.value))}
+            onChange={(e) => {
+              if (
+                Number(e.target.value) > 0 &&
+                Number(e.target.value) <=
+                  Math.ceil(repositories.total_count / Number(perPage))
+              ) {
+                setPage(Number(e.target.value));
+              }
+            }}
           />
-          /{Math.ceil(repositories.total_count / 30)}
-        </span>
-
-        {/* <button
-          onClick={() => handlePage(page + 1)}
-          disabled={page === Math.ceil(repositories.total_count / 30)}
-        >
-          NEXT
-        </button> */}
+           / {Math.ceil(repositories.total_count / Number(perPage))}
+        </div>
       </div>
+        
+      
     </div>
   );
 };
