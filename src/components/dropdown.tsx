@@ -58,7 +58,7 @@ const Dropdown = ({
       >
         {selectedOption.length > 0 ? selectedOption.join(", ") : placeholder} 
 
-        <KeyboardArrowDownIcon sx={{ fontSize: 32 }} className="absolute ml-44"/>
+        <KeyboardArrowDownIcon/>
       </div>
 
       {open && (

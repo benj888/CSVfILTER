@@ -98,12 +98,13 @@ const GithubSearch = () => {
 
   return (
     <div className=" p-2 h-full overflow-auto" onScroll={handleScroll}>
-      <div className="text-center text-2xl">Github Repo Search</div>
-      <div className="flex gap-x-4">
-        <div className="flex flex-col">
-          <p>Serching</p>
+      <div className="text-center text-2xl p-2">Github Repo Search</div>
+
+      <div className="grid grid-cols-6 gap-x-10">
+        <div className="flex flex-col ">
+          <p>Serching:</p>
           <input
-            className="shadow-lg border w-60 rounded px-4 py-1"
+            className="shadow-lg border w-full rounded px-4 py-1"
             type="text"
             placeholder="Serching..."
             value={query}
@@ -113,8 +114,8 @@ const GithubSearch = () => {
             }}
           />
         </div>
-        <div className="flex flex-col w-60">
-          <p>Perpage</p>
+        <div className="flex flex-col w-full">
+          <p>Perpage:</p>
           <input
             type="text"
             className="shadow-lg border rounded px-4 py-1"
@@ -126,10 +127,12 @@ const GithubSearch = () => {
             }}
           />
         </div>
-        <div className="w-60 text-center bg-red-400 rounded shadow-lg pt-4">
+
+        <div className="w-full flex text-center items-center justify-center bg-red-400 rounded shadow-lg cursor-pointer mt-2"
+        onClick={() => router.push("/dataSearch")}
+        >
           <button
-            className="text-xl"
-            onClick={() => router.push("/dataSearch")}
+            className="text-lg"
           >
             To Data Search...
           </button>
@@ -183,7 +186,6 @@ const GithubSearch = () => {
           loading ? "opacity-0" : "opacity-100"
         }`}
       >
-        
         <div className="text-lg">
           <input
             className="shadow-lg border rounded px-4 py-1 w-28"
@@ -201,11 +203,9 @@ const GithubSearch = () => {
               }
             }}
           />
-           / {Math.ceil(repositories.total_count / Number(perPage))}
+          / {Math.ceil(repositories.total_count / Number(perPage))}
         </div>
       </div>
-        
-      
     </div>
   );
 };

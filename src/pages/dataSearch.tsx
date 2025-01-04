@@ -5,23 +5,29 @@ import { useRouter } from "next/router";
 import { PortalDraw } from "@/components/portalDrawer";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import EditIcon from "@mui/icons-material/Edit";
-
+import ClearIcon from "@mui/icons-material/Clear";
+import FileDownloadIcon from "@mui/icons-material/FileDownload";
+import AddIcon from '@mui/icons-material/Add';
+import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 const Data = () => {
   const [searchText, setSearchText] = useState("");
+
   const [searchGender, setSearchGender] = useState<string[]>([]);
 
   const [clicklist, setClicklist] = useState(data);
 
   const [newList, setNewList] = useState(data);
 
-  const [editDataTri, setEditDataTri] = useState(false);
+  // const [editDataTri, setEditDataTri] = useState(true);
 
   const [editData, setEditData] = useState(false);
 
   const router = useRouter();
 
+  const [newDataWindow, setnewDataWindow] = useState(false);
+
   const [newdata, setNewdata] = useState({
-    id: Math.max(...newList.map((item) => item.id)),
+    id: Math.max(...newList.map((item) => item.id)) + 1,
     first_name: "",
     last_name: "",
     email: "",
@@ -38,7 +44,6 @@ const Data = () => {
       newdata.ip_address &&
       newdata.email
     ) {
-      // setClicklist([...clicklist, newdata]);
       setNewList([...newList, newdata]);
 
       setNewdata((prev) => ({
@@ -64,9 +69,17 @@ const Data = () => {
     } else {
       setNewdata((prev) => ({ ...prev, id: 1 }));
     }
-  }, [newList]);
-
-  const [newDataWindow, setnewDataWindow] = useState(false);
+    if (newDataWindow === false) {
+      setNewdata((prev) => ({
+        ...prev,
+        first_name: "",
+        last_name: "",
+        email: "",
+        gender: "",
+        ip_address: "",
+      }));
+    }
+  }, [newList, newDataWindow]);
 
   useEffect(() => {
     const filterSerach = newList.filter((item) => {
@@ -131,6 +144,7 @@ const Data = () => {
 
   const handledragging = (index: number) => {
     setDraggingIndex(index);
+    
   };
 
   const handleDrop = (index: number) => {
@@ -146,8 +160,9 @@ const Data = () => {
     setDraggingIndex(null);
   };
 
-  //delete
-  const [isCheckboxVisible, setIsCheckboxVisible] = useState(false);
+  //multiple delete
+  // const [isCheckboxVisible, setIsCheckboxVisible] = useState(false);
+  // const [deleteVisible, setDeleteVisible] =  useState(false);
   const [deleteId, setDeleteId] = useState<number[]>([]);
 
   const handleCheckDelete = (id: number) => {
@@ -160,10 +175,18 @@ const Data = () => {
   const handleDeleteSelected = () => {
     setNewList((prev) => prev.filter((item) => !deleteId.includes(item.id)));
     setDeleteId([]);
-    setIsCheckboxVisible(false);
+    // setIsCheckboxVisible(false);
+  };
+
+  //single delete
+
+  // const [singledeleteId, setSingleDeleteId] = useState<number | null>(null);
+  const handleSingleDelete = (id: number) => {
+    setNewList(newList.filter((item) => item.id !== id));
   };
 
   // edit
+
   type NewData = {
     id: number;
     first_name: string;
@@ -172,7 +195,6 @@ const Data = () => {
     gender: string;
     ip_address: string;
   };
-
   const [editItem, setEditItem] = useState<any>(null);
 
   const handleSaveEdit = () => {
@@ -183,7 +205,6 @@ const Data = () => {
     );
     setEditItem(null);
   };
-
 
   return (
     <>
@@ -228,10 +249,11 @@ const Data = () => {
           <div className="pt-7">
             <button
               onClick={exportCSV}
-              className="p-2 text-white rounded  bg-blue-400 shadow-lg w-full"
+              className="p-2 text-white rounded  bg-yellow-500 shadow-lg w-full"
             >
-              Export to CSV
+              Export to CSV <FileDownloadIcon/>
             </button>
+            
           </div>
 
           <div className="pt-7">
@@ -239,7 +261,7 @@ const Data = () => {
               className="text-white w-full p-2 bg-blue-600 rounded shadow-lg"
               onClick={() => setnewDataWindow(true)}
             >
-              ADD
+            <AddIcon className="pb-1" />  ADD 
             </button>
 
             <PortalDraw
@@ -247,11 +269,11 @@ const Data = () => {
               handleSetVisible={setnewDataWindow}
             >
               <div className="p-6 ">
-                <div className="flex items-center pb-4">
+                <div className="flex items-center pb-4 ">
                   <label className="w-24 font-semibold">First Name:</label>
                   <input
                     type="text"
-                    className="border p-2"
+                    className="border p-2 shadow-md rounded"
                     placeholder="First Name"
                     value={newdata.first_name}
                     onChange={(e) =>
@@ -264,7 +286,7 @@ const Data = () => {
                   <label className="w-24 font-semibold">Last Name:</label>
                   <input
                     type="text"
-                    className="border p-2"
+                    className="border p-2 shadow-md rounded"
                     placeholder="Last Name"
                     value={newdata.last_name}
                     onChange={(e) =>
@@ -277,7 +299,7 @@ const Data = () => {
                   <label className="w-24 font-semibold">Email:</label>
                   <input
                     type="text"
-                    className="border p-2"
+                    className="border p-2 shadow-md rounded"
                     placeholder="Email"
                     value={newdata.email}
                     onChange={(e) =>
@@ -288,7 +310,7 @@ const Data = () => {
 
                 <div className="flex items-center pb-4">
                   <label className="w-24 font-semibold">Gender:</label>
-                  <input
+                  {/* <input
                     type="text"
                     className="border p-2"
                     placeholder="Gender"
@@ -296,14 +318,26 @@ const Data = () => {
                     onChange={(e) =>
                       setNewdata({ ...newdata, gender: e.target.value })
                     }
-                  />
+                  /> */}
+                  <select
+                    id="dropdown"
+                    value={newdata.gender}
+                    onChange={(e) => {
+                      setNewdata({ ...newdata, gender: e.target.value });
+                    }}
+                    className="border shadow-lg p-2 rounded"
+                  >
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                    <option value="Other">Other</option>
+                  </select>
                 </div>
 
                 <div className="flex items-center pb-4">
                   <label className="w-24 font-semibold">IP Address:</label>
                   <input
                     type="text"
-                    className="border p-2"
+                    className="border p-2 shadow-md rounded"
                     placeholder="IP Address"
                     value={newdata.ip_address}
                     onChange={(e) =>
@@ -313,13 +347,16 @@ const Data = () => {
                 </div>
 
                 <div
-                  className="mt-20 ml-32 text-xl text-center shadow-lg border w-20 bg-blue-300 cursor-pointer"
+                  className="text-xl text-center shadow-lg border cursor-pointer "
                   onClick={() => {
                     handleAddData();
-                    setnewDataWindow(false);
                   }}
                 >
-                  <button>送出</button>
+                  <button
+                    className="text-white w-full p-2 bg-blue-600 rounded"
+                  >
+                    送出
+                  </button>
                 </div>
               </div>
             </PortalDraw>
@@ -328,37 +365,47 @@ const Data = () => {
           <div
             className="pt-7"
             onClick={() => {
-              setIsCheckboxVisible(!isCheckboxVisible);
-              setEditDataTri(false);
+              // setIsCheckboxVisible(!isCheckboxVisible);
+              // setEditDataTri(false);
             }}
           >
-            {isCheckboxVisible ? (
-              <div className="">
-                <button
-                  className="p-2 text-white rounded bg-red-600 shadow-lg w-full"
-                  onClick={handleDeleteSelected}
-                >
-                  Confirm Delete
-                </button>
-              </div>
-            ) : (
-              <button className="p-2 text-white rounded  bg-red-500 shadow-lg w-full">
-                Delete
+            <div className="">
+              <button
+                className={`p-2 text-white rounded shadow-lg w-full ${
+                  deleteId.length > 0 ? "bg-red-600" : "bg-red-600/50"
+                }`}
+                onClick={handleDeleteSelected}
+                disabled={!deleteId}
+              >
+                Delete <DeleteForeverIcon/>
               </button>
-            )}
+            </div>
+
+            {/* <button className="p-2 text-white rounded  bg-red-500 shadow-lg w-full">
+                Delete
+              </button> */}
           </div>
 
           <div className="pt-7">
             <button
+              className="text-white w-full p-2 bg-green-500 rounded shadow-lg"
+              onClick={() => router.push("/")}
+            >
+              To Github Search <ArrowForwardIcon />
+            </button>
+          </div>
+
+          <div className="pt-7">
+            {/* <button
               className="p-2 text-white rounded  bg-green-500 shadow-lg w-full"
               onClick={(e) => {
-                setEditDataTri(!editDataTri);
+                // setEditDataTri(!editDataTri);
                 setIsCheckboxVisible(false);
                 e.stopPropagation();
               }}
             >
               Edit
-            </button>
+            </button> */}
 
             {editData && (
               <PortalDraw visible={editData} handleSetVisible={setEditData}>
@@ -456,26 +503,16 @@ const Data = () => {
               </PortalDraw>
             )}
           </div>
-
-          <div className="pt-7">
-            <button
-              className="text-white w-full p-2 bg-red-400 rounded shadow-lg"
-              onClick={() => router.push("/")}
-            >
-              To Github Search <ArrowForwardIcon />
-            </button>
-          </div>
-
-          <div className="mt-10 text-center"></div>
+          
         </div>
 
         <div className="flex-1 bg-white overflow-auto">
-          <table className="table-auto w-full  border border-gray-300 text-lg ">
-            <thead className=" font-bold border bg-[#eaf3fc]   sticky top-0">
+          <table className="table-auto w-full  border border-gray-300 text-lg">
+            <thead className=" font-bold border bg-[#eaf3fc] sticky top-0">
               <tr>
-                {editDataTri && <th className="text-left p-2"></th>}
+                <th className="text-left p-2"></th>
 
-                {isCheckboxVisible && <th className="text-left p-2"></th>}
+                <th className="text-left p-2"></th>
 
                 <th className="text-left p-2">id</th>
                 <th className="text-left p-2">first_name</th>
@@ -483,6 +520,7 @@ const Data = () => {
                 <th className="text-left p-2">email</th>
                 <th className="text-left p-2">gender</th>
                 <th className="text-left p-2">ip_address</th>
+                <th></th>
               </tr>
             </thead>
 
@@ -490,9 +528,9 @@ const Data = () => {
               {clicklist.map((item, index) => (
                 <tr
                   key={item.id}
-                  className={`border p-2 cursor-pointer hover:bg-gray-300  duration-200
+                  className={`  border p-2  hover:bg-gray-300  duration-200
                     ${index % 2 === 0 ? "bg-white" : "bg-[rgb(247,248,253,1)]"}
-                 ${draggingIndex === index ? "bg-gray-300 shadow-lg" : ""}
+                    ${draggingIndex === index ?  "cursor-grabbing " : "cursor-grab"}
                     `}
                   draggable
                   onDragStart={() => {
@@ -502,37 +540,46 @@ const Data = () => {
                   onDrop={() => handleDrop(index)}
                   onDragEnd={handleDragEnd}
                 >
-                  {editDataTri && (
-                    <td
-                      className="p-2 hover:bg-slate-400 rounded-full inline-block"
-                      onClick={(e) => {
-                        setEditData(true);
+                  <td
+                    className="p-2 hover:bg-slate-400 rounded-full inline-block cursor-pointer"
+                    onClick={(e) => {
+                      setEditData(true);
 
-                        setEditItem(item);
+                      // setIsCheckboxVisible(false);
 
-                        e.stopPropagation();
-                      }}
-                    >
-                      <EditIcon />
-                    </td>
-                  )}
+                      setEditItem(item);
 
-                  {isCheckboxVisible && (
-                    <td className="p-2">
-                      <input
-                        type="checkbox"
-                        checked={deleteId.includes(item.id)}
-                        onChange={() => handleCheckDelete(item.id)}
-                        className="scale-150"
-                      />
-                    </td>
-                  )}
+                      e.stopPropagation();
+                    }}
+                  >
+                    <EditIcon />
+                  </td>
+
+                  {/* {isCheckboxVisible && ( */}
+                  <td className="p-2">
+                    <input
+                      type="checkbox"
+                      checked={deleteId.includes(item.id)}
+                      onChange={() => handleCheckDelete(item.id)}
+                      className="scale-150"
+                    />
+                  </td>
+                  {/* )} */}
                   <td className="p-2">{item.id}</td>
                   <td className="p-2">{item.first_name}</td>
                   <td className="p-2">{item.last_name}</td>
                   <td className="p-2">{item.email}</td>
                   <td className="p-2">{item.gender}</td>
                   <td className="p-2">{item.ip_address}</td>
+                  <td
+                    className="hover:bg-red-500 rounded-full inline-block p-2 cursor-pointer"
+                    onClick={() => {
+                      // setSingleDeleteId(item.id);
+                      handleSingleDelete(item.id);
+                    }}
+                  >
+                    <ClearIcon />
+                  </td>
                 </tr>
               ))}
             </tbody>
