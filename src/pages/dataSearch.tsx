@@ -7,8 +7,8 @@ import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import EditIcon from "@mui/icons-material/Edit";
 import ClearIcon from "@mui/icons-material/Clear";
 import FileDownloadIcon from "@mui/icons-material/FileDownload";
-import AddIcon from '@mui/icons-material/Add';
-import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
+import AddIcon from "@mui/icons-material/Add";
+import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 const Data = () => {
   const [searchText, setSearchText] = useState("");
 
@@ -144,7 +144,6 @@ const Data = () => {
 
   const handledragging = (index: number) => {
     setDraggingIndex(index);
-    
   };
 
   const handleDrop = (index: number) => {
@@ -249,19 +248,18 @@ const Data = () => {
           <div className="pt-7">
             <button
               onClick={exportCSV}
-              className="p-2 text-white rounded  bg-yellow-500 shadow-lg w-full"
+              className="flex items-center justify-center p-2 text-white rounded  bg-yellow-500 shadow-lg w-full"
             >
-              Export to CSV <FileDownloadIcon/>
+              Export to CSV <FileDownloadIcon />
             </button>
-            
           </div>
 
-          <div className="pt-7">
+          <div className="pt-7 ">
             <button
-              className="text-white w-full p-2 bg-blue-600 rounded shadow-lg"
+              className="flex items-center justify-center text-white w-full p-2 bg-blue-600 rounded shadow-lg"
               onClick={() => setnewDataWindow(true)}
             >
-            <AddIcon className="pb-1" />  ADD 
+              <AddIcon className="pb-1 " /> ADD
             </button>
 
             <PortalDraw
@@ -352,9 +350,7 @@ const Data = () => {
                     handleAddData();
                   }}
                 >
-                  <button
-                    className="text-white w-full p-2 bg-blue-600 rounded"
-                  >
+                  <button className="text-white w-full p-2 bg-blue-600 rounded">
                     送出
                   </button>
                 </div>
@@ -371,13 +367,13 @@ const Data = () => {
           >
             <div className="">
               <button
-                className={`p-2 text-white rounded shadow-lg w-full ${
+                className={`flex items-center justify-center p-2 text-white rounded shadow-lg w-full ${
                   deleteId.length > 0 ? "bg-red-600" : "bg-red-600/50"
                 }`}
                 onClick={handleDeleteSelected}
                 disabled={!deleteId}
               >
-                Delete <DeleteForeverIcon/>
+                Delete <DeleteForeverIcon />
               </button>
             </div>
 
@@ -388,7 +384,7 @@ const Data = () => {
 
           <div className="pt-7">
             <button
-              className="text-white w-full p-2 bg-green-500 rounded shadow-lg"
+              className="flex items-center justify-center text-white w-full p-2 bg-green-500 rounded shadow-lg"
               onClick={() => router.push("/")}
             >
               To Github Search <ArrowForwardIcon />
@@ -503,12 +499,11 @@ const Data = () => {
               </PortalDraw>
             )}
           </div>
-          
         </div>
 
         <div className="flex-1 bg-white overflow-auto">
           <table className="table-auto w-full  border border-gray-300 text-lg">
-            <thead className=" font-bold border bg-[#eaf3fc] sticky top-0">
+            <thead className=" font-bold border bg-[#eaf3fc] sticky top-0 z-10">
               <tr>
                 <th className="text-left p-2"></th>
 
@@ -530,15 +525,24 @@ const Data = () => {
                   key={item.id}
                   className={`  border p-2  hover:bg-gray-300  duration-200
                     ${index % 2 === 0 ? "bg-white" : "bg-[rgb(247,248,253,1)]"}
-                    ${draggingIndex === index ?  "cursor-grabbing " : "cursor-grab"}
+                    ${
+                      draggingIndex === index
+                        ? "cursor-grabbing"
+                        : "cursor-grab"
+                    }
                     `}
                   draggable
                   onDragStart={() => {
                     handledragging(index);
                   }}
-                  onDragOver={(e) => e.preventDefault()}
+                  onDragOver={(e) => {
+                    e.preventDefault();
+                    e.dataTransfer.dropEffect = "move";
+                  }}
                   onDrop={() => handleDrop(index)}
-                  onDragEnd={handleDragEnd}
+                  onDragEnd={() => {
+                    handleDragEnd();
+                  }}
                 >
                   <td
                     className="p-2 hover:bg-slate-400 rounded-full inline-block cursor-pointer"
@@ -561,7 +565,7 @@ const Data = () => {
                       type="checkbox"
                       checked={deleteId.includes(item.id)}
                       onChange={() => handleCheckDelete(item.id)}
-                      className="scale-150"
+                      className="scale-150 "
                     />
                   </td>
                   {/* )} */}
